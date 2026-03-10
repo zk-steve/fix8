@@ -73,9 +73,6 @@ BRAND_DESCRIPTION='Modern fast FIX Framework'
 BRAND_COMPANY_SHORTNAME='fix8'
 BRAND_COMPANY_LONGNAME='fix8 by David L. Dight'
 
-# Check for C++11
-AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
-
 # Checks for programs.
 LT_INIT
 AC_PROG_CXX
@@ -85,10 +82,35 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_TYPE_LONG_LONG_INT
 
+# Check for C++20
+AC_LANG_PUSH([C++])
+AC_CACHE_CHECK([for C++20 compiler flag], [fix8_cv_cxx20_flag], [
+	fix8_cv_cxx20_flag=no
+	fix8_saved_CXXFLAGS="$CXXFLAGS"
+	for fix8_flag in -std=c++20 -std=c++2a; do
+		CXXFLAGS="$fix8_saved_CXXFLAGS $fix8_flag"
+		AC_COMPILE_IFELSE(
+			[AC_LANG_SOURCE([[
+				#if !defined(__cplusplus) || __cplusplus < 202002L
+				#error Fix8 requires C++20
+				#endif
+				int main() { return 0; }
+			]])],
+			[fix8_cv_cxx20_flag="$fix8_flag"; break],
+			[])
+	done
+	CXXFLAGS="$fix8_saved_CXXFLAGS"
+])
+AC_LANG_POP([C++])
+if test "x$fix8_cv_cxx20_flag" = "xno"; then
+	AC_MSG_ERROR([Fix8 requires C++20 compiler support.])
+fi
+CXXFLAGS="$CXXFLAGS $fix8_cv_cxx20_flag"
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
-HAVE_SYS_TIME_H
+AC_CHECK_HEADERS([sys/time.h])
 AC_STRUCT_TM
 AC_HEADER_STDBOOL
 AC_TYPE_PID_T
@@ -865,4 +887,3 @@ AC_OUTPUT
 
 AC_SUBST(CONFIG_SHELL)
 AM_CONDITIONAL(HAVE_OPENSSL, test "x$openssl" = "xyes")
-
