@@ -19,7 +19,7 @@ and framework; and a set of complete client/server test applications.
 1. [Directory Layout](#directory-layout)
 1. [Documentation](#documentation)
 1. [Branch Layout](#branch-layout)
-1. [C++11](#c11)
+1. [C++20](#c20)
 1. [External Dependencies (required)](#external-dependencies-required)
 1. [Optional Dependencies](#optional-dependencies)
 1. [Building on Linux/UNIX](#building-on-linuxunix)
@@ -183,11 +183,11 @@ a login. For our complete API Documentation see [here](http://fix8.org/fix8/html
 </table>
 
 
-## C++11
+## C++20
 
-Fix8 now **requires C++11 compiler support**. Fix8 will refuse to build without it. If you are using clang or gcc make sure you have the
+Fix8 now **requires C++20 compiler support**. Fix8 will refuse to build without it. If you are using clang or gcc make sure you have the
 
-	-std=c++11
+	-std=c++20
 
 flag on your compiler command line. Some older compiler versions may no longer be supported. Sorry.
 
@@ -231,6 +231,25 @@ If you wish to use BerkeleyDB for message persistence:
 - [Berkeley DB C++](http://www.oracle.com/technetwork/products/berkeleydb/downloads/index.html)
 
 ## Building on Linux/UNIX
+
+Fix8 now ships a first-class CMake build alongside the legacy autotools flow.
+
+### Preferred: CMake
+
+Configure and build from the repository root:
+
+	% cmake --preset release
+	% cmake --build --preset release
+
+Available presets:
+
+- `debug`
+- `release`
+- `release-no-ssl`
+
+The CMake build keeps the current Poco-backed transport/session stack, but the source lists are split so a future non-Poco transport backend can be added without reworking the whole build again.
+
+### Legacy: autotools
 
 The build system is based on automake/autoconf/libtool.
 You **must** have [libtool](http://www.gnu.org/software/libtool/) installed to build.

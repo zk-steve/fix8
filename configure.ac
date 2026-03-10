@@ -73,8 +73,17 @@ BRAND_DESCRIPTION='Modern fast FIX Framework'
 BRAND_COMPANY_SHORTNAME='fix8'
 BRAND_COMPANY_LONGNAME='fix8 by David L. Dight'
 
-# Check for C++11
-AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
+# Check for C++20
+fix8_have_cxx20=no
+AX_CHECK_COMPILE_FLAG([-std=c++20],
+	[CXXFLAGS="$CXXFLAGS -std=c++20"; fix8_have_cxx20=yes])
+if test x$fix8_have_cxx20 = xno; then
+	AX_CHECK_COMPILE_FLAG([-std=c++2a],
+		[CXXFLAGS="$CXXFLAGS -std=c++2a"; fix8_have_cxx20=yes])
+fi
+if test x$fix8_have_cxx20 = xno; then
+	AC_MSG_ERROR([Fix8 requires C++20 compiler support.])
+fi
 
 # Checks for programs.
 LT_INIT
@@ -865,4 +874,3 @@ AC_OUTPUT
 
 AC_SUBST(CONFIG_SHELL)
 AM_CONDITIONAL(HAVE_OPENSSL, test "x$openssl" = "xyes")
-
